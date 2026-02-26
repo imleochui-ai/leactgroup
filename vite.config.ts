@@ -1,28 +1,40 @@
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '');
+  // 讀取 .env 變數
+  const env = loadEnv(mode, process.cwd(), '')
 
   return {
-    base: '/leactgroup/',   // ⭐⭐⭐ 必須
+    // ⭐ GitHub Pages 子路徑
+    base: '/leactgroup/',
 
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+    ],
 
+    // ⭐ 建議使用 import.meta.env 而不是 process.env
     define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      __APP_ENV__: JSON.stringify(env.APP_ENV),
     },
 
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(__dirname, './'),
       },
     },
 
     server: {
+      // Codespaces / AI Studio 兼容
       hmr: process.env.DISABLE_HMR !== 'true',
     },
-  };
-});
+
+    build: {
+      outDir: 'dist',
+      sourcemap: false,
+    },
+  }
+})
